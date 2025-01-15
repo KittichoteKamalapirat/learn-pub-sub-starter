@@ -5,12 +5,6 @@ const (
 
 	WarRecognitionsPrefix = "war"
 
-	PauseKey = "pause"
-
+	PauseKey    = "pause"
 	GameLogSlug = "game_logs"
-)
-
-const (
-	ExchangePerilDirect = "peril_direct"
-	ExchangePerilTopic  = "peril_topic"
 )
