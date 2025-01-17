@@ -1,13 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
 
 	"github.com/KittichoteKamalapirat/learn-pub-sub-starter/internal/pubsub"
-	"github.com/KittichoteKamalapirat/learn-pub-sub-starter/internal/routing"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -33,18 +31,16 @@ func main() {
 	}
 	defer ch.Close()
 
-	// Create a PlayingState message
-	state := routing.PlayingState{IsPaused: true}
-	body, err := json.Marshal(state)
-	if err != nil {
-		fmt.Println("Failed to marshal JSON:", err)
-		return
-	}
+	// Declare and bind the durable queue named game_logs
+	queueName := "game_logs"
+	exchange := "peril_topic"   // Use the new exchange
+	routingKey := "game_logs.*" // Routing key for the queue
+	simpleQueueType := 0        // Set to 0 for durable
 
-	// Publish the message
-	err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, "pause", body)
+	// Call DeclareAndBind
+	_, _, err = pubsub.DeclareAndBind(conn, exchange, queueName, routingKey, simpleQueueType)
 	if err != nil {
-		fmt.Println("Failed to publish message:", err)
+		fmt.Println("Failed to declare and bind queue:", err)
 		return
 	}
 

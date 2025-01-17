@@ -43,7 +43,50 @@ func main() {
 	}
 	defer ch.Close() // Ensure the channel is closed when done
 
-	// Additional logic can go here...
+	// Create a new game state
+	gameState := gamelogic.NewGameState(username)
+
+	// Start the REPL loop
+	for {
+		// Get user input
+		words := gamelogic.GetInput()
+		if len(words) == 0 {
+			continue
+		}
+
+		command := words[0]
+		switch command {
+		case "spawn":
+			if err := gameState.CommandSpawn(words); err != nil {
+				fmt.Println("Error:", err)
+			}
+
+		case "move":
+			if army, err := gameState.CommandMove(words); err != nil {
+				fmt.Println("Error:", err)
+			} else {
+				fmt.Println("Move successful.")
+				fmt.Println(army)
+			}
+
+		case "status":
+			gameState.CommandStatus()
+
+		case "help":
+			gamelogic.PrintClientHelp()
+
+		case "spam":
+			fmt.Println("Spamming not allowed yet!")
+
+		case "quit":
+			gamelogic.PrintQuit()
+			return
+
+		default:
+			fmt.Println("Don't understand that command")
+		}
+	}
+
 	// Wait for ctrl+c
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt)
